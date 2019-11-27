@@ -2,6 +2,8 @@ import argparse
 import numpy as np
 import csv
 from scipy.integrate import odeint
+from multiprocessing import Pool
+from functools import partial
 
 
 DEFAULT_RESOLUTION = 6
@@ -44,7 +46,7 @@ def solve(L1, L2, m1, m2, tmax, dt, y0):
     x2 = x1 + L2 * np.sin(theta2)
     y2 = y1 - L2 * np.cos(theta2)
 
-    return theta1, theta2, x1, y1, x2, y2
+    return y0[0], y0[2], theta1, theta2, x1, y1, x2, y2
 
 def gen_simulation_model_params(theta_resolution):
     search_space = np.linspace(0, 2*np.pi, theta_resolution)
@@ -52,14 +54,20 @@ def gen_simulation_model_params(theta_resolution):
         for theta2_init in search_space:
             yield theta1_init, theta2_init
 
-def simulate_pendulum(theta_resolution, dt=DEFAULT_DT, tmax=DEFAULT_TMAX, L1=DEFAULT_L1, L2=DEFAULT_L2, m1=DEFAULT_M1, m2=DEFAULT_M2):
-    for theta1_init, theta2_init in gen_simulation_model_params(theta_resolution):
-        # Initial conditions: theta1_init, dtheta1_init/dt, theta2_init, dtheta2_init/dt.
-        y0 = np.array([theta1_init, 0, theta2_init, 0])
+def simulate_pendulum_parallel(theta_resolution, dt=DEFAULT_DT, tmax=DEFAULT_TMAX, L1=DEFAULT_L1, L2=DEFAULT_L2, m1=DEFAULT_M1, m2=DEFAULT_M2):
+        with Pool() as pool:
+            partial_solve = partial(solve, L1, L2, m1, m2, tmax, dt)
+            results = pool.imap(
+                partial_solve,
+                (
+                    np.array([theta1_init, 0, theta2_init, 0])
+                    for theta1_init, theta2_init in gen_simulation_model_params(theta_resolution)
+                ), 
+                1
+            )
+            for theta1_init, theta2_init, theta1, theta2, x1, y1, x2, y2 in results:  
+                yield theta1_init, theta2_init, theta1[-1], theta2[-1]
 
-        theta1, theta2, x1, y1, x2, y2 = solve(L1, L2, m1, m2, tmax, dt, y0)
-        #yield theta1_init, theta2_init, theta1[-1], theta2[-1], x1[-1], y1[-1], x2[-1], y2[-1]
-        yield theta1_init, theta2_init, theta1[-1], theta2[-1]
 
 def write_to_csv(filename, results):
         with open(filename, 'w', newline = '\n') as csvfile:
@@ -97,7 +105,7 @@ def main():
         help="Simulation time step, %f by default" % DEFAULT_DT
     )
     args = parser.parse_args()
-    results = simulate_pendulum(
+    results = simulate_pendulum_parallel(
         theta_resolution=args.resolution,
         dt=args.dt,
         tmax=args.tmax,
