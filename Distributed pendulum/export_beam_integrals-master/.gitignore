@@ -1,0 +1,4 @@
+.vagrant/
+*.pyc
+_developer_experiments/
+.vscode/
