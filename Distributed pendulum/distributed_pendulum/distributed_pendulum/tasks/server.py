@@ -13,7 +13,7 @@ from celery.exceptions import Reject
 import numpy as np
 import tables as tb
 
-import export_beam_integrals as ebi
+import distributed_pendulum as ebi
 from ..app import app
 from .worker import compute_integral, combine_computed_integrals_into_a_table
 
