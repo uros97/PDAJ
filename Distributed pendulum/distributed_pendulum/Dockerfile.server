@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y \
   python-tables \
   rabbitmq-server \
   redis-server \
-  supervisor
+  supervisor \
+  python-scipy
 
 # Install the required Python packages
 # Celery has to be installed via pip, as Ubuntu distributes an older version which has a critical bug involving chords
@@ -41,7 +42,6 @@ ENV PENDULUM_L2  1
 ENV PENDULUM_M1  1
 ENV PENDULUM_M2  1
 
-ENV PENDULUM_G  9.81
 
 # HDF5 storage configuration
 ENV HDF5_COMPLIB zlib

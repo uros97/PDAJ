@@ -4,10 +4,6 @@ worker:
   hostname: worker
   environment:
     MAX_CPU_CORES: 2
-    MAX_RAM: 1g
-    BEAM_INTEGRALS_MAX_MODE: 2
-  cpuset: "0,1"
-  mem_limit: 1g
   links:
    - server
 
@@ -20,9 +16,6 @@ server:
    - "6379:6379" # Redis
   environment:
     MAX_CPU_CORES: 2
-    MAX_RAM: 1g
-    BEAM_INTEGRALS_MAX_MODE: 2
-  cpuset: "2,3"
-  mem_limit: 1g
+    PENDULUM_RESOLUTION: 36
   volumes:
    - /tmp/results:/results

@@ -15,7 +15,7 @@ import tables as tb
 
 import distributed_pendulum as ebi
 from ..app import app
-from .worker import compute_integral, combine_computed_integrals_into_a_table
+from .worker import compute_integral, combine_computed_integrals_into_a_table, solve
 
 
 ## Recording the experiment status
@@ -46,6 +46,65 @@ def seed_computations(ignore_result=True):
         (export_beam_integrals(beam_type_id) for beam_type_id in BaseBeamType.plugins.valid_ids),
         record_experiment_status.si('completed')
     ).delay()
+
+
+def gen_simulation_model_params(theta_resolution, L1, L2, m1, m2, tmax, dt):
+    search_space = np.linspace(0, 2*np.pi, theta_resolution)
+    for theta1_init in search_space:
+        for theta2_init in search_space:
+            # Initial conditions: theta1_init, dtheta1_init/dt, theta2_init, dtheta2_init/dt.
+            y0 = np.array([theta1_init, 0, theta2_init, 0])
+
+            yield theta1_init, theta2_init, L1, L2, m1, m2, tmax, dt, y0
+           
+@app.task
+def simulate_pendulum():
+    theta_resolution = app.conf.PENDULUM_RESOLUTION
+    dt = app.conf.PENDULUM_DT
+    tmax = app.conf.PENDULUM_TMAX
+    L1 = app.conf.PENDULUM_L1
+    L2 = app.conf.PENDULUM_L2
+    m1 = app.conf.PENDULUM_M1
+    m2 = app.conf.PENDULUM_M2
+
+    for theta1_init, theta2_init, L1, L2, m1, m2, tmax, dt, y0 in gen_simulation_model_params(theta_resolution, L1, L2, m1, m2, tmax, dt,):
+
+        theta1, theta2, x1, y1, x2, y2 = solve(L1, L2, m1, m2, tmax, dt, y0)
+        #yield theta1_init, theta2_init, theta1[-1], theta2[-1], x1[-1], y1[-1], x2[-1], y2[-1]
+        yield theta1_init, theta2_init, theta1[-1], theta2[-1]
+
+@app.task
+def write_to_csv(results):
+        results_dir = app.conf.RESULTS_DIR
+        filename = os.path.join(results_dir, "distributed.csv")
+
+        with open(filename, 'w', newline = '\n') as csvfile:
+            seqwriter = csv.writer(csvfile, delimiter = ',')
+            seqwriter.writerow(['theta1_init', 'theta2_init', 'theta1', 'theta2'])
+            seqwriter.writerows(results)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def export_beam_integrals(beam_type_id):
     # OPTIMIZATION: Compute only the canonical integrals, as per the section 3.3.1 of my PhD thesis
