@@ -1,7 +1,7 @@
 from multiprocessing import cpu_count
 import os
 
-from beam_integrals import DEFAULT_MAX_MODE, DEFAULT_DECIMAL_PRECISION
+
 from kombu import Queue
 
 
@@ -11,9 +11,7 @@ MAX_CPU_CORES = os.getenv('MAX_CPU_CORES', cpu_count())
 SERVER_NAME = os.getenv('SERVER_NAME', 'localhost')
 AM_I_SERVER = (os.getenv('COMPUTER_TYPE') == 'server')
 
-BEAM_INTEGRALS_MAX_MODE = int(os.getenv('BEAM_INTEGRALS_MAX_MODE', DEFAULT_MAX_MODE))
-BEAM_INTEGRALS_DECIMAL_PRECISION = int(os.getenv('BEAM_INTEGRALS_DECIMAL_PRECISION', DEFAULT_DECIMAL_PRECISION))
-BEAM_INTEGRALS_NORMALIZE_INTEGRALS_SMALLER_THAN = float(os.getenv('BEAM_INTEGRALS_NORMALIZE_INTEGRALS_SMALLER_THAN', 1e-9))
+
 
 PENDULUM_RESOLUTION = int(os.getenv('PENDULUM_RESOLUTION', 6))
 PENDULUM_TMAX = float(os.getenv('PENDULUM_TMAX', 30))
@@ -26,9 +24,6 @@ PENDULUM_M2 = float(os.getenv('PENDULUM_M2', 1))
 
 
 if AM_I_SERVER:
-
-    HDF5_COMPLIB = os.getenv('HDF5_COMPLIB', 'zlib')
-    HDF5_COMPLEVEL = int(os.getenv('HDF5_COMPLEVEL', 1))
 
     RESULTS_DIR = os.getenv('RESULTS_DIR', '/tmp/results')
     STATUS_DIR = os.path.join(RESULTS_DIR, 'status')

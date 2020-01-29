@@ -1,8 +1,6 @@
 from __future__ import division
 from math import log
-from beam_integrals.beam_types import BaseBeamType 
-from beam_integrals.exceptions import UnableToGuessScaleFunctionError
-from beam_integrals.integrals import BaseIntegral, integrate
+
 
 from ..app import app
 
@@ -41,7 +39,7 @@ def solve(theta1_init, theta2_init, L1, L2, m1, m2, tmax, dt, y0):
     # Convert to Cartesian coordinates of the two bob positions.
     x1 = L1 * np.sin(theta1)
     y1 = -L1 * np.cos(theta1)
-    x2 = x1 + L2 * np.sin(theta2)
-    y2 = y1 - L2 * np.cos(theta2)
+    # x2 = x1 + L2 * np.sin(theta2)
+    # y2 = y1 - L2 * np.cos(theta2)
 
     return theta1_init, theta2_init, theta1[-1], theta2[-1] #treba da vraca theta inite i umesto niza, samo poslednje vrednosti

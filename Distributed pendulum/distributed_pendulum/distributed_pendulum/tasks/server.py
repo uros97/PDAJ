@@ -5,15 +5,12 @@ import subprocess
 import time
 import csv
 
-import beam_integrals as bi
-from beam_integrals.beam_types import BaseBeamType
-from beam_integrals.integrals import BaseIntegral
+
 from celery import chain, chord
 from celery.exceptions import Reject
 import numpy as np
 import tables as tb
 
-import distributed_pendulum as ebi
 from ..app import app
 from .worker import solve
 

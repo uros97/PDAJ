@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-MAINTAINER Petar Maric <petarmaric@uns.ac.rs>
+MAINTAINER Uros Jakovljevic <uros.jakovljevic97@gmail.com>
 
 # Fix Docker-specific Ubuntu issues
 # (see https://journal.paul.querna.org/articles/2013/10/15/docker-ubuntu-on-rackspace/ for details)
@@ -29,10 +29,8 @@ ENV COMPUTER_TYPE server
 ENV SERVER_NAME server
 ENV WORKER_LIST worker
 
-# App specific configuration, based on 'beam_integrals' defaults
-ENV BEAM_INTEGRALS_MAX_MODE 100
-ENV BEAM_INTEGRALS_DECIMAL_PRECISION 155
-ENV BEAM_INTEGRALS_NORMALIZE_INTEGRALS_SMALLER_THAN 1e-9
+# App specific configuration, based on 'distributed_pendulum' defaults
+
 ENV PENDULUM_RESOLUTION  6
 ENV PENDULUM_TMAX  30
 ENV PENDULUM_DT  0.01
@@ -43,9 +41,7 @@ ENV PENDULUM_M1  1
 ENV PENDULUM_M2  1
 
 
-# HDF5 storage configuration
-ENV HDF5_COMPLIB zlib
-ENV HDF5_COMPLEVEL 1
+
 
 # Create a directory for storing results
 ENV RESULTS_DIR /results
